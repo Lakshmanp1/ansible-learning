@@ -1,6 +1,6 @@
 - name: create ec2 and r53 records
   hosts: local
-  connections: local
+  connection: local
   vars:
     instanses:
     - mysql
