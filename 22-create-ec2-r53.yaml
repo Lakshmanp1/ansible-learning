@@ -2,7 +2,56 @@
   hosts: local
   connections: local
   vars:
-    
+    instanses:
+    - mysql
+    - backend
+    - frontend
+    vpc_subnet_id: subnet-01d704f7bec211287
+    instance_type: t3.micro
+    security_group: sg-03bf2f0215982b4f0
+    image_id: ami-09c813fb71547fc4f
+    zone: lakshman.site
   tasks:
   - name: create ec2 instances
-    amazon.aws.instance:
+    amazon.aws.ec2_instance:
+      name: "{{ item }}"
+      vpc_subnet_id: "{{ vpc_subnet_id }}"
+      instance_type: "{{ instance_type }}"
+      security_group: "{{ security_group }}"
+      image_id: "{{ image_id }}"
+    loop: "{{ instanses }}"
+    register: ec2_info
+
+  - name: print ec2_info
+    ansible.builtin.debug:
+      msg: "{{ ec2-info }}"
+
+  - name: print ec2 instance private ip addresses
+    ansible.builtin.debug:
+      msg: "{{ item.instance[0].private_ip_address }}"
+    loop: "{{ ec2-info.results}}"
+
+  - name: create private ip r53 records
+    community.aws.route53:
+      state: present
+      zone: "{{ zone }}"
+      record: "{{ item.item }}.{{ zone }}"
+      type: A
+      ttl: 1
+      value: "{{ item.instance[0].private_ip_address }}"
+      wait: yes
+      overwrite: true
+    loop: "{{ ec2-info.results}}"
+
+  - name: create public ip frontend records
+    community.aws.route53:
+      state: present
+      zone: "{{ zone }}"
+      record: "{{ zone }}"
+      type: A
+      ttl: 1
+      value: "{{ item.instance[0].public_ip_address }}"
+      wait: yes
+      overwrite: true
+    loop: "{{ ec2-info.results}}"
+    when: ec2_info == "frontend"
