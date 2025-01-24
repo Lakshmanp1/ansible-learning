@@ -2,7 +2,7 @@
   hosts: local
   connection: local
   vars:
-    instanses:
+    instances:
     - mysql
     - backend
     - frontend
@@ -20,6 +20,7 @@
     loop:
     - boto3
     - botocore
+
   - name: create ec2 instances
     amazon.aws.ec2_instance:
       name: "{{ item }}"
@@ -27,7 +28,7 @@
       instance_type: "{{ instance_type }}"
       security_group: "{{ security_group }}"
       image_id: "{{ image_id }}"
-    loop: "{{ instanses }}"
+    loop: "{{ instances }}"
     register: ec2_info
 
   - name: print ec2_info
