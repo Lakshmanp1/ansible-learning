@@ -11,7 +11,15 @@
     security_group: sg-03bf2f0215982b4f0
     image_id: ami-09c813fb71547fc4f
     zone: lakshman.site
+
   tasks:
+  - name: install python libararies
+    ansible.builtin.pip:
+      name: "{{ item }}"
+      executable: pip3.9
+    loop:
+    - boto3
+    - botocore
   - name: create ec2 instances
     amazon.aws.ec2_instance:
       name: "{{ item }}"
