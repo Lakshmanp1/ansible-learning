@@ -35,10 +35,10 @@
   #   ansible.builtin.debug:
   #     msg: "{{ ec2-info }}"
 
-  - name: print ec2 instance private ip addresses
-    ansible.builtin.debug:
-      msg: "{{ item.instances[0].private_ip_address }}"
-    loop: "{{ ec2_info.results}}"
+  # - name: print ec2 instance private ip addresses
+  #   ansible.builtin.debug:
+  #     msg: "{{ item.instances[0].private_ip_address }}"
+  #   loop: "{{ ec2_info.results}}"
 
   - name: create private ip r53 records
     community.aws.route53:
@@ -63,4 +63,4 @@
       wait: yes
       overwrite: true
     loop: "{{ ec2_info.results }}"
-    when: ec2_info == "frontend"
+    when: item.item == "frontend"
