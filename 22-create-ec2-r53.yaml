@@ -37,7 +37,7 @@
 
   - name: print ec2 instance private ip addresses
     ansible.builtin.debug:
-      msg: "{{ item.instance[0].private_ip_address }}"
+      msg: "{{ item.instances[0].private_ip_address }}"
     loop: "{{ ec2-info.results}}"
 
   - name: create private ip r53 records
